@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>MatGraf Pro — Hesaplama ve Grafik Stüdyosu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <!-- Yukaridaki head bolumu iPhone/Android viewport-fit destegini, fontlari ve style.css dosyasini yukler. -->
+</head>
+<body class="min-h-screen flex flex-col overflow-x-hidden bg-brand">
+  <!-- Ust Gezinme Cubugu -->
+  <header class="sticky top-0 z-30 panel-card border-x-0 border-t-0">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-3">
+      <button id="btnGoHome" type="button" class="flex items-center gap-2.5 min-w-0 text-left group">
+        <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md">
+          <i data-lucide="line-chart" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        </div>
+        <div class="min-w-0">
+          <h1 class="text-sm sm:text-lg font-extrabold tracking-tight truncate">MatGraf Pro</h1>
+        </div>
+      </button>
+
+      <!-- Masaustu Mod Degistirme Cubugu (Mobilde kesinlikle gizli kalir) -->
+      <div class="hidden md:block">
+        <div id="topModeSwitcher" class="hidden inline-flex items-center gap-1 p-1 rounded-xl soft-surface">
+        <button type="button" data-nav-mode="calc" class="px-3 py-1.5 rounded-lg text-xs font-semibold opacity-75 hover:opacity-100">Sadece Hesap</button>
+        <button type="button" data-nav-mode="graph" class="px-3 py-1.5 rounded-lg text-xs font-semibold opacity-75 hover:opacity-100">Sadece Grafik</button>
+          <button type="button" data-nav-mode="both" class="px-3 py-1.5 rounded-lg text-xs font-semibold opacity-75 hover:opacity-100">Hesap + Grafik</button>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div class="inline-flex rounded-xl p-0.5 soft-surface" role="group" aria-label="Açı birimi">
+          <button id="btnDeg" type="button" class="px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-bold rounded-lg bg-blue-600 text-white">DEG</button>
+          <button id="btnRad" type="button" class="px-2 sm:px-2.5 py-1 text-[11px] sm:text-xs font-semibold rounded-lg opacity-70 hover:opacity-100">RAD</button>
+        </div>
+        <button id="btnTheme" type="button" title="Temayı Değiştir" class="p-1.5 sm:p-2 rounded-xl soft-surface hover:border-blue-500 transition-colors">
+          <i id="themeIcon" data-lucide="sun" class="w-4 h-4 text-blue-500"></i>
+        </button>
+        <button id="btnHelp" type="button" class="inline-flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold soft-surface hover:border-red-500 transition-colors">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5 text-red-500"></i>
+          <span class="hidden sm:inline">Yardım</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobil Mod Degistirme Cubugu -->
+    <div id="mobileModeSwitcher" class="hidden md:hidden px-3 pb-2.5">
+      <div class="grid grid-cols-3 gap-1 p-1 rounded-xl soft-surface">
+        <button type="button" data-nav-mode="calc" class="py-1.5 rounded-lg text-xs font-semibold opacity-75">Hesap</button>
+        <button type="button" data-nav-mode="graph" class="py-1.5 rounded-lg text-xs font-semibold opacity-75">Grafik</button>
+        <button type="button" data-nav-mode="both" class="py-1.5 rounded-lg text-xs font-semibold opacity-75">İkisi</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-3 sm:py-6 flex flex-col">
+    <!-- ACILIS EKRANI: 3 KUTU SECIMI -->
+    <section id="homeMenu" class="flex-1 flex flex-col justify-center py-2 sm:py-10">
+      <div class="text-center max-w-2xl mx-auto mb-5 sm:mb-10">
+        <span class="inline-block px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-blue-600/15 text-blue-500 border border-blue-600/30 mb-2 sm:mb-3">
+          Matematik &amp; Grafik Çalışma Alanı
+        </span>
+        <h2 class="text-xl sm:text-4xl font-extrabold tracking-tight">Nasıl çalışmak istersin?</h2>
+        <p class="text-xs sm:text-base mt-1.5 sm:mt-2" style="color: var(--text-muted)">
+          Üç kutudan birini seç: sadece hesaplama yap, sadece X-Y grafik çiz ya da ikisini bir arada kullan.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-5 max-w-5xl w-full mx-auto">
+        <button type="button" data-select-mode="calc" class="mode-box panel-card rounded-2xl sm:rounded-3xl p-4 sm:p-7 text-left flex flex-row md:flex-col items-center md:items-start justify-between gap-3.5 sm:gap-6 hover:border-blue-600 shadow-xl">
+          <div class="flex md:block items-center gap-3.5 flex-1">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 md:mb-5 shadow-md">
+              <i data-lucide="calculator" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-base sm:text-xl font-extrabold mb-0.5 sm:mb-2">1. Sadece Hesaplama</h3>
+              <p class="text-xs sm:text-sm leading-snug sm:leading-relaxed" style="color: var(--text-muted)">
+                Dört işlem, değişken atama, trigonometri, türev ve integral hesaplarını grafik olmadan anında çöz.
+              </p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-blue-500 shrink-0">
+            <span class="hidden sm:inline">Hesaplamaya Başla</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </div>
+        </button>
+
+        <button type="button" data-select-mode="graph" class="mode-box panel-card rounded-2xl sm:rounded-3xl p-4 sm:p-7 text-left flex flex-row md:flex-col items-center md:items-start justify-between gap-3.5 sm:gap-6 hover:border-red-600 shadow-xl">
+          <div class="flex md:block items-center gap-3.5 flex-1">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-red-600 text-white flex items-center justify-center shrink-0 md:mb-5 shadow-md">
+              <i data-lucide="line-chart" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-base sm:text-xl font-extrabold mb-0.5 sm:mb-2">2. Sadece Grafik</h3>
+              <p class="text-xs sm:text-sm leading-snug sm:leading-relaxed" style="color: var(--text-muted)">
+                Aralıklı (&lt;, &gt;), çoklu ve değişkenli her fonksiyonu doğrudan X-Y koordinat düzleminde çiz.
+              </p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-red-500 shrink-0">
+            <span class="hidden sm:inline">Grafik Oluştur</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </div>
+        </button>
+
+        <button type="button" data-select-mode="both" class="mode-box panel-card rounded-2xl sm:rounded-3xl p-4 sm:p-7 text-left flex flex-row md:flex-col items-center md:items-start justify-between gap-3.5 sm:gap-6 hover:border-blue-600 shadow-xl relative overflow-hidden">
+          <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-600 to-red-600"></div>
+          <div class="flex md:block items-center gap-3.5 flex-1">
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-600 to-red-600 text-white flex items-center justify-center shrink-0 md:mb-5 shadow-md">
+              <i data-lucide="layers" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-base sm:text-xl font-extrabold mb-0.5 sm:mb-2">3. Hesaplama + Grafik</h3>
+              <p class="text-xs sm:text-sm leading-snug sm:leading-relaxed" style="color: var(--text-muted)">
+                İşlemini hem hesapla hem de aynı anda etkileşimli X-Y koordinat düzleminde gör.
+              </p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-blue-500 shrink-0">
+            <span class="hidden sm:inline">İkisini Birlikte Aç</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- CALISMA ALANI -->
+    <div id="workspaceView" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 flex-1 items-start">
+      <!-- Sol Sutun: Sonuc + Islem Kutusu + Degiskenler + Tus Takimi + Listeler -->
+      <div id="leftColumn" class="lg:col-span-5 xl:col-span-4 flex flex-col gap-3 sm:gap-4 order-2 lg:order-1">
+        <section id="resultCard" class="panel-card rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 shadow-xl">
+          <div class="flex items-center justify-between gap-2 mb-1.5">
+            <span id="resultModeBadge" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] sm:text-xs font-bold bg-blue-600/15 text-blue-500 border border-blue-600/30">
+              <i data-lucide="trending-up" class="w-3.5 h-3.5"></i>
+              <span>Sonuç</span>
+            </span>
+            <button id="btnCopyResult" type="button" class="inline-flex items-center gap-1 text-xs font-medium opacity-70 hover:opacity-100 transition-opacity">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+              <span id="copyLabel">Kopyala</span>
+            </button>
+          </div>
+          <div id="resultExpr" class="text-xs font-mono-math truncate" style="color: var(--text-muted)">3^2</div>
+          <div id="resultValue" class="text-xl sm:text-3xl font-extrabold font-mono-math mt-0.5 break-all">= 9</div>
+          <p id="resultNote" class="text-[11px] sm:text-xs mt-1.5 leading-relaxed" style="color: var(--text-muted)"></p>
+        </section>
+
+        <!-- Hesap Makinesi + Hemen Ustunde Islem Giris Kutusu (Solda yildiz YOK!) -->
+        <section class="panel-card rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-xl space-y-2.5 sm:space-y-3">
+          <form id="exprForm" class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <label for="exprInput" class="block text-[11px] sm:text-xs font-bold uppercase tracking-wider" style="color: var(--text-muted)">İşleminiz</label>
+              <div class="flex items-center gap-1.5">
+                <button id="btnClearAll" type="button" class="text-[11px] font-bold text-red-500 px-2 py-0.5 rounded-lg bg-red-600/15 border border-red-600/30 hover:bg-red-600/25">
+                  Tümünü Sil
+                </button>
+                <button id="btnToggleKeypad" type="button" class="lg:hidden text-[11px] font-bold text-blue-500 px-2 py-0.5 rounded-lg bg-blue-600/10">
+                  Tuşları Gizle
+                </button>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <div class="relative flex-1">
+                <input
+                  id="exprInput"
+                  type="text"
+                  autocomplete="off"
+                  spellcheck="false"
+                  value="3 üzeri 2"
+                  placeholder="Örn: 3 üzeri 2, x^2 x>0, sin(x), cos(x)..."
+                  style="background: var(--input-bg); border-color: var(--border-subtle); color: var(--text-main);"
+                  class="w-full pl-3.5 pr-9 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl border focus:border-blue-600 focus:ring-2 focus:ring-blue-600/30 outline-none text-base font-mono-math transition-all"
+                />
+                <button id="btnClearInput" type="button" title="Temizle" class="absolute inset-y-0 right-2 my-auto w-7 h-7 rounded-lg flex items-center justify-center opacity-60 hover:opacity-100">
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+              </div>
+              <button id="btnSubmit" type="submit" class="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md transition-all shrink-0">
+                <i data-lucide="play" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                <span id="btnSubmitLabel">Hesapla</span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Tanimli Degiskenler Cubugu (a = 5, x = a vb.) -->
+          <div id="variablesBar" class="hidden pt-1 space-y-1.5">
+            <span class="text-[11px] font-bold uppercase tracking-wider" style="color: var(--text-muted)">Tanımlı Değişkenler</span>
+            <div id="variablesList" class="flex flex-wrap gap-1.5"></div>
+          </div>
+
+          <!-- Hizli Dene (3. Kutu olan "Hem Hesap Hem Grafik" modunda tamamen gizlenir!) -->
+          <div id="quickExamplesWrap" class="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <span class="text-[11px] font-semibold mr-0.5" style="color: var(--text-muted)">Hızlı:</span>
+            <button type="button" data-example="3 üzeri 2" class="example-chip px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-blue-600/15 text-blue-500 border border-blue-600/30">3 üzeri 2</button>
+            <button type="button" data-example="x^2 x > 0" class="example-chip px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-red-600/15 text-red-500 border border-red-600/30">x² x&gt;0</button>
+            <button type="button" data-example="sin(x), cos(x)" class="example-chip px-2 py-0.5 rounded-lg text-[11px] font-semibold soft-surface">sin(x), cos(x)</button>
+            <button type="button" data-example="a = 3, x = a" class="example-chip px-2 py-0.5 rounded-lg text-[11px] font-semibold soft-surface">a=3, x=a</button>
+            <button type="button" data-example="125 + 48 * 3" class="example-chip px-2 py-0.5 rounded-lg text-[11px] font-semibold soft-surface">125+48*3</button>
+          </div>
+
+          <div id="errorBanner" class="hidden px-3 py-2 rounded-xl bg-red-600/15 border border-red-600/35 text-red-500 text-xs flex items-center gap-2">
+            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+            <span id="errorText"></span>
+          </div>
+
+          <!-- 4 Sekmeli Tus Takimi -->
+          <div id="keypadContainer" class="pt-1.5 border-t border-white/10">
+            <div class="flex gap-1 p-1 rounded-xl sm:rounded-2xl soft-surface mb-2.5">
+              <button type="button" data-pad-tab="basic" class="flex-1 py-1.5 sm:py-2 px-1.5 rounded-lg sm:rounded-xl text-xs font-bold bg-blue-600 text-white shadow-sm transition-all">Temel</button>
+              <button type="button" data-pad-tab="trig" class="flex-1 py-1.5 sm:py-2 px-1.5 rounded-lg sm:rounded-xl text-xs font-semibold opacity-70 hover:opacity-100 transition-all">Trig</button>
+              <button type="button" data-pad-tab="deriv" class="flex-1 py-1.5 sm:py-2 px-1.5 rounded-lg sm:rounded-xl text-xs font-semibold opacity-70 hover:opacity-100 transition-all">Türev</button>
+              <button type="button" data-pad-tab="integral" class="flex-1 py-1.5 sm:py-2 px-1.5 rounded-lg sm:rounded-xl text-xs font-semibold opacity-70 hover:opacity-100 transition-all">İntegral</button>
+            </div>
+
+            <!-- Temel -->
+            <div data-pad-panel="basic" class="space-y-1.5 sm:space-y-2">
+              <div class="grid grid-cols-5 gap-1.5">
+                <button type="button" data-insert="x" class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math bg-blue-600/15 text-blue-500 border border-blue-600/30">x</button>
+                <button type="button" data-insert="a" class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math bg-blue-600/15 text-blue-500 border border-blue-600/30">a</button>
+                <button type="button" data-insert=" = " class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math soft-surface">=</button>
+                <button type="button" data-insert=" < " class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math soft-surface">&lt;</button>
+                <button type="button" data-insert=" > " class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math soft-surface">&gt;</button>
+              </div>
+              <div class="grid grid-cols-5 gap-1.5">
+                <button type="button" data-insert="^" class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math bg-blue-600/15 text-blue-500 border border-blue-600/30">xⁿ</button>
+                <button type="button" data-insert="√(" class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">√</button>
+                <button type="button" data-insert="|" class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">|x|</button>
+                <button type="button" data-insert="π" class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">π</button>
+                <button type="button" data-insert=", " class="keypad-btn py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math soft-surface">,</button>
+              </div>
+              <div class="grid grid-cols-4 gap-1.5">
+                <button type="button" data-action="clear" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-bold bg-red-600/15 text-red-500 border border-red-600/30">C</button>
+                <button type="button" data-insert="(" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">(</button>
+                <button type="button" data-insert=")" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">)</button>
+                <button type="button" data-insert=" / " class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-base font-bold bg-blue-600/15 text-blue-500 border border-blue-600/30">÷</button>
+                <button type="button" data-insert="7" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">7</button>
+                <button type="button" data-insert="8" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">8</button>
+                <button type="button" data-insert="9" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">9</button>
+                <button type="button" data-insert=" * " class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-base font-bold bg-blue-600/15 text-blue-500 border border-blue-600/30">×</button>
+                <button type="button" data-insert="4" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">4</button>
+                <button type="button" data-insert="5" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">5</button>
+                <button type="button" data-insert="6" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">6</button>
+                <button type="button" data-insert=" - " class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-base font-bold bg-blue-600/15 text-blue-500 border border-blue-600/30">−</button>
+                <button type="button" data-insert="1" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">1</button>
+                <button type="button" data-insert="2" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">2</button>
+                <button type="button" data-insert="3" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">3</button>
+                <button type="button" data-insert=" + " class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-base font-bold bg-blue-600/15 text-blue-500 border border-blue-600/30">+</button>
+                <button type="button" data-insert="0" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">0</button>
+                <button type="button" data-insert="." class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold font-mono-math soft-surface">.</button>
+                <button type="button" data-action="backspace" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-sm font-semibold soft-surface flex items-center justify-center"><i data-lucide="delete" class="w-4 h-4"></i></button>
+                <button type="button" data-action="equals" class="keypad-btn py-2 sm:py-2.5 rounded-lg sm:rounded-xl text-base font-bold bg-red-600 hover:bg-red-700 text-white shadow-md">=</button>
+              </div>
+            </div>
+
+            <!-- Trigonometri -->
+            <div data-pad-panel="trig" class="hidden space-y-2">
+              <div class="grid grid-cols-3 gap-1.5">
+                <button type="button" data-insert="sin(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math bg-blue-600/15 text-blue-500 border border-blue-600/30">sin(x)</button>
+                <button type="button" data-insert="cos(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math bg-blue-600/15 text-blue-500 border border-blue-600/30">cos(x)</button>
+                <button type="button" data-insert="tan(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math bg-blue-600/15 text-blue-500 border border-blue-600/30">tan(x)</button>
+                <button type="button" data-insert="cot(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">cot(x)</button>
+                <button type="button" data-insert="sec(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">sec(x)</button>
+                <button type="button" data-insert="csc(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">csc(x)</button>
+                <button type="button" data-insert="arcsin(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">arcsin</button>
+                <button type="button" data-insert="arccos(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">arccos</button>
+                <button type="button" data-insert="arctan(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">arctan</button>
+                <button type="button" data-insert="π" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-sm font-bold font-mono-math bg-red-600/15 text-red-500 border border-red-600/30">π</button>
+                <button type="button" data-insert="°" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-sm font-bold font-mono-math bg-red-600/15 text-red-500 border border-red-600/30">°</button>
+                <button type="button" data-action="equals" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-bold bg-blue-600 text-white">Uygula</button>
+              </div>
+            </div>
+
+            <!-- Turev -->
+            <div data-pad-panel="deriv" class="hidden space-y-2">
+              <div class="grid grid-cols-4 gap-1.5">
+                <button type="button" data-insert="d/dx(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math bg-red-600/15 text-red-500 border border-red-600/30">d/dx(</button>
+                <button type="button" data-insert="x²" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">x²</button>
+                <button type="button" data-insert="x³" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">x³</button>
+                <button type="button" data-insert="x^" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">xⁿ</button>
+                <button type="button" data-insert="sin(x)" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">sin(x)</button>
+                <button type="button" data-insert="cos(x)" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">cos(x)</button>
+                <button type="button" data-insert="ln(x)" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">ln(x)</button>
+                <button type="button" data-insert="exp(x)" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">eˣ</button>
+              </div>
+              <div class="flex items-center gap-2 pt-0.5">
+                <input id="derivPointInput" type="number" step="any" placeholder="İsteğe bağlı x₀" style="background: var(--input-bg); border-color: var(--border-subtle); color: var(--text-main);" class="flex-1 px-3 py-2 rounded-xl border text-base sm:text-xs font-mono-math outline-none focus:border-red-500" />
+                <button id="btnSolveDeriv" type="button" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-md shrink-0">Türevini Al</button>
+              </div>
+            </div>
+
+            <!-- Integral -->
+            <div data-pad-panel="integral" class="hidden space-y-2">
+              <div class="grid grid-cols-4 gap-1.5">
+                <button type="button" data-insert="∫(" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-sm font-bold font-mono-math bg-blue-600/15 text-blue-500 border border-blue-600/30">∫(</button>
+                <button type="button" data-insert=")dx" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-bold font-mono-math bg-blue-600/15 text-blue-500 border border-blue-600/30">)dx</button>
+                <button type="button" data-insert="x²" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">x²</button>
+                <button type="button" data-insert="x³" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">x³</button>
+                <button type="button" data-insert="1/x" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">1/x</button>
+                <button type="button" data-insert="sin(x)" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">sin(x)</button>
+                <button type="button" data-insert="cos(x)" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">cos(x)</button>
+                <button type="button" data-insert="exp(x)" class="keypad-btn py-2 rounded-lg sm:rounded-xl text-xs font-semibold font-mono-math soft-surface">eˣ</button>
+              </div>
+              <div class="grid grid-cols-2 gap-2 pt-0.5">
+                <input id="intLowerInput" type="number" step="any" placeholder="Alt sınır (a)" style="background: var(--input-bg); border-color: var(--border-subtle); color: var(--text-main);" class="px-3 py-2 rounded-xl border text-base sm:text-xs font-mono-math outline-none focus:border-blue-500" />
+                <input id="intUpperInput" type="number" step="any" placeholder="Üst sınır (b)" style="background: var(--input-bg); border-color: var(--border-subtle); color: var(--text-main);" class="px-3 py-2 rounded-xl border text-base sm:text-xs font-mono-math outline-none focus:border-blue-500" />
+              </div>
+              <button id="btnSolveInt" type="button" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-md">İntegralini Çöz (∫)</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Aktif Grafikler / Islem Gecmisi (Gecmisi Sil butonu dahil) -->
+        <section class="panel-card rounded-2xl sm:rounded-3xl shadow-xl overflow-hidden">
+          <div class="flex border-b border-white/10">
+            <button id="tabGraphs" type="button" class="flex-1 py-2 text-xs font-bold text-blue-500 border-b-2 border-blue-600 transition-colors">Aktif Grafikler (<span id="graphCount">0</span>)</button>
+            <button id="tabHistory" type="button" class="flex-1 py-2 text-xs font-semibold opacity-65 hover:opacity-100 border-b-2 border-transparent transition-colors">İşlem Geçmişi (<span id="historyCount">0</span>)</button>
+          </div>
+          <div id="panelGraphs" class="p-2.5 max-h-36 sm:max-h-44 overflow-y-auto custom-scroll space-y-1.5"></div>
+          <div id="panelHistory" class="hidden p-2.5 space-y-2">
+            <div class="flex justify-end">
+              <button id="btnClearHistory" type="button" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-red-600/15 text-red-500 border border-red-600/30 hover:bg-red-600/25">
+                İşlem Geçmişini Sil
+              </button>
+            </div>
+            <div id="historyListWrap" class="max-h-36 sm:max-h-44 overflow-y-auto custom-scroll space-y-1.5"></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Sag Sutun: X-Y Koordinat Duzlemi (Mobilde EN USTTE) -->
+      <section id="rightGraphSection" class="lg:col-span-7 xl:col-span-8 panel-card rounded-2xl sm:rounded-3xl shadow-2xl flex flex-col overflow-hidden order-1 lg:order-2">
+        <div class="px-3 sm:px-4 py-2.5 sm:py-3 border-b border-white/10 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span class="w-2.5 h-2.5 rounded-full bg-red-600 shrink-0"></span>
+            <span class="text-xs sm:text-sm font-bold truncate">X-Y Koordinat Düzlemi</span>
+            <span id="angleUnitPill" class="px-2 py-0.5 rounded-lg text-[10px] sm:text-[11px] font-semibold soft-surface">DEG</span>
+          </div>
+          <div class="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+            <button id="btnToggleRef" type="button" class="hidden sm:inline-flex px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-blue-600/15 text-blue-500 border border-blue-600/30 hover:bg-blue-600/25">Referans Eğri: Açık</button>
+            <button id="btnZoomIn" type="button" class="p-2 sm:p-1.5 rounded-xl soft-surface hover:border-blue-500" title="Yakınlaştır"><i data-lucide="zoom-in" class="w-4 h-4"></i></button>
+            <button id="btnZoomOut" type="button" class="p-2 sm:p-1.5 rounded-xl soft-surface hover:border-blue-500" title="Uzaklaştır"><i data-lucide="zoom-out" class="w-4 h-4"></i></button>
+            <button id="btnResetView" type="button" class="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold soft-surface hover:border-blue-500">Sıfırla</button>
+            <button id="btnClearGraphs" type="button" class="px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-red-600/15 text-red-500 border border-red-600/30 hover:bg-red-600/25">Temizle</button>
+          </div>
+        </div>
+
+        <div id="canvasContainer" class="relative w-full h-[260px] sm:h-[420px] lg:h-[600px]">
+          <canvas id="graphCanvas" class="w-full h-full block"></canvas>
+          <div id="coordBadge" class="pointer-events-none absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 px-2.5 py-1 rounded-xl bg-black/85 text-white border border-white/15 text-[11px] sm:text-xs font-mono-math shadow-lg flex items-center gap-1.5">
+            <span>x: 0.00</span><span class="opacity-50">|</span><span>y: 0.00</span>
+          </div>
+          <div class="pointer-events-none absolute bottom-2.5 right-2.5 sm:bottom-3.5 sm:right-3.5 px-2.5 py-1 rounded-xl bg-black/75 text-white border border-white/15 text-[10px] sm:text-[11px]">
+            <span class="sm:hidden">Sürükle · İki parmakla büyüt/küçült</span>
+            <span class="hidden sm:inline">Sürükleyerek kaydır · Tekerlekle yakınlaştır</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Yardim Modali -->
+  <div id="helpModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="panel-card rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-base font-bold">MatGraf Pro Kullanım Rehberi</h3>
+        <button id="btnCloseHelp" type="button" class="p-1.5 rounded-xl soft-surface"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="space-y-2.5 text-xs sm:text-sm" style="color: var(--text-muted)">
+        <div class="p-3 rounded-2xl bg-blue-600/10 border border-blue-600/25">
+          <p class="font-bold text-blue-500 mb-0.5">Aralık (&lt; / &gt;) &amp; Çoklu Grafik</p>
+          <p><code class="font-mono-math">x^2 x &gt; 0</code> veya <code class="font-mono-math">sin(x) -2 &lt; x &lt; 4</code> yazarak belirli aralıkları çizebilir; virgül veya boşlukla (<code class="font-mono-math">sin(x), cos(x)</code>) aynı anda birden fazla grafik görebilirsin.</p>
+        </div>
+        <div class="p-3 rounded-2xl bg-red-600/10 border border-red-600/25">
+          <p class="font-bold text-red-500 mb-0.5">Değişken Atama (a = 5, x = a)</p>
+          <p><code class="font-mono-math">a = 3</code> yazıp ardından <code class="font-mono-math">x = a</code> veya <code class="font-mono-math">a*x^2</code> çizebilir, alttaki kutucuktan <code class="font-mono-math">a</code> değerini canlı değiştirebilirsin.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>window.MATGRAF_USE_API = true;</script>
+  <script src="/static/js/math_engine.js"></script>
+  <script src="/static/js/graph_renderer.js"></script>
+  <script src="/static/js/app.js"></script>
+  <!-- Yukaridaki script etiketleri ayri JS modullerini sirayla sayfaya yukler. -->
+</body>
+</html>
